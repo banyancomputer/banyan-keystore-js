@@ -1,5 +1,9 @@
-import errors from '../src/errors'
-import utils from '../src/utils'
+import errors from '../src/errors';
+import utils from '../src/utils';
+import { EccCurve, KeyUse, PublicKey } from '../src/types';
+import * as ecc from '../src/ecc';
+
+const PRETTY_FINGERPRINT_REGEX = new RegExp('^[0-9a-fA-F]{2}(?::[0-9a-fA-F]{2})*$');
 
 describe('utils', () => {
   it('uses rejection sampling to generate ', async () => {
@@ -33,5 +37,14 @@ describe('utils', () => {
   it('does not support max values below 1', async () => {
     const fn = () => utils.randomBuf(1, { max: -20 })
     expect(fn).toThrow(errors.InvalidMaxValue)
+  })
+
+  it('fingerprints are valid', async () => {
+    const keyPair = await ecc.genKeyPair(EccCurve.P_384, KeyUse.Write)
+    const fingerprint = await utils.fingerprintEcPublicKey(keyPair.publicKey as PublicKey)
+    // Expect the fingerprint to be a sha1 hash
+    expect(fingerprint.length).toBe(20);
+    const prettyFingerprint = utils.prettyFingerprint(fingerprint)
+    expect(prettyFingerprint).toMatch(PRETTY_FINGERPRINT_REGEX)
   })
 })

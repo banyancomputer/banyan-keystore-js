@@ -10,7 +10,6 @@ import {
   PublicKey,
   PrivateKey,
   KeyUse,
-  EscrowedKeyPair,
   CipherText,
 } from '../types.js';
 import { DEFAULT_SYMM_ALG } from '../constants.js';
@@ -56,43 +55,54 @@ export default class ECCKeyStore extends KeyStoreBase implements KeyStore {
     const keyPair = await this.getWriteKeyPair();
     return ecc.exportPublicKey(keyPair.publicKey as PublicKey);
   }
-  async fingerprintPublicExchangeKey(): Promise<string> {
-    const keyPair = await this.getExchangeKeyPair();
-    return ecc.fingerprintPublicKey(keyPair.publicKey as PublicKey);
-  }
-  async fingerprintPublicWriteKey(): Promise<string> {
-    const keyPair = await this.getWriteKeyPair();
-    return ecc.fingerprintPublicKey(keyPair.publicKey as PublicKey);
-  }
 
-  // Key Escrow and Recovery
-
-  async exportEscrowedExchangeKeyPair(
+  // Private Key Escrowers
+  async exportEscrowedPrivateExchangeKey(
     cfg?: Partial<Config>
-  ): Promise<EscrowedKeyPair> {
+  ): Promise<string> {
     const mergedCfg = config.merge(this.cfg, cfg);
     const keyPair = await this.getExchangeKeyPair();
     const escrowKey = await this.getSymmKey(mergedCfg.escrowKeyName);
-    return await ecc.exportEscrowedKeyPair(
-      keyPair.publicKey as PublicKey,
+    return await ecc.exportEscrowedPrivateKey(
       keyPair.privateKey as PrivateKey,
       escrowKey
     );
   }
-  async exportEscrowedWriteKeyPair(
-    cfg?: Partial<Config>
-  ): Promise<EscrowedKeyPair> {
+  async exportEscrowedPrivateWriteKey(cfg?: Partial<Config>): Promise<string> {
     const mergedCfg = config.merge(this.cfg, cfg);
     const keyPair = await this.getWriteKeyPair();
     const escrowKey = await this.getSymmKey(mergedCfg.escrowKeyName);
-    return await ecc.exportEscrowedKeyPair(
-      keyPair.publicKey as PublicKey,
+    return await ecc.exportEscrowedPrivateKey(
       keyPair.privateKey as PrivateKey,
       escrowKey
     );
   }
-  async importEscrowedExchangeKeyPair(
-    escrowKeyPair: EscrowedKeyPair,
+
+  async importPublicExchangeKey(
+    publicKey: string,
+    cfg?: Partial<Config>
+  ): Promise<void> {
+    const mergedCfg = config.merge(this.cfg, cfg);
+    await IDB.createIfDoesNotExist(
+      this.cfg.exchangeKeyPairName,
+      () => ecc.importPublicKey(publicKey, mergedCfg.curve, KeyUse.Exchange),
+      this.store
+    );
+  }
+  async importPublicWriteKey(
+    publicKey: string,
+    cfg?: Partial<Config>
+  ): Promise<void> {
+    const mergedCfg = config.merge(this.cfg, cfg);
+    await IDB.createIfDoesNotExist(
+      this.cfg.writeKeyPairName,
+      () => ecc.importPublicKey(publicKey, mergedCfg.curve, KeyUse.Write),
+      this.store
+    );
+  }
+
+  async importEscrowedPrivateExchangeKey(
+    privateKey: string,
     cfg?: Partial<Config>
   ): Promise<void> {
     const mergedCfg = config.merge(this.cfg, cfg);
@@ -100,8 +110,8 @@ export default class ECCKeyStore extends KeyStoreBase implements KeyStore {
     await IDB.createIfDoesNotExist(
       this.cfg.exchangeKeyPairName,
       () =>
-        ecc.importEscrowedKeyPair(
-          escrowKeyPair,
+        ecc.importEscrowedPrivateKey(
+          privateKey,
           escrowKey,
           mergedCfg.curve,
           KeyUse.Exchange
@@ -109,9 +119,8 @@ export default class ECCKeyStore extends KeyStoreBase implements KeyStore {
       this.store
     );
   }
-
-  async importEscrowedWriteKeyPair(
-    escrowKeyPair: EscrowedKeyPair,
+  async importEscrowedPrivateWriteKey(
+    privateKey: string,
     cfg?: Partial<Config>
   ): Promise<void> {
     const mergedCfg = config.merge(this.cfg, cfg);
@@ -119,8 +128,8 @@ export default class ECCKeyStore extends KeyStoreBase implements KeyStore {
     await IDB.createIfDoesNotExist(
       this.cfg.writeKeyPairName,
       () =>
-        ecc.importEscrowedKeyPair(
-          escrowKeyPair,
+        ecc.importEscrowedPrivateKey(
+          privateKey,
           escrowKey,
           mergedCfg.curve,
           KeyUse.Write

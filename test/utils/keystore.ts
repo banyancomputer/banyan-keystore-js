@@ -1,7 +1,6 @@
-import KeyStore from '../../src/keystore';
+import KeyStore from '../../src/keystore/base';
 import config from '../../src/config';
 import idb from '../../src/idb';
-import { KeyStoreInterface } from '../../src/types';
 import { mock } from './mock';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -15,7 +14,7 @@ type Mock = {
 type KeystoreMethodOpts = {
   desc: string;
   mocks: Mock[];
-  reqFn: (ks: KeyStoreInterface) => Promise<any>;
+  reqFn: (ks: KeyStore) => Promise<any>;
   expectedResp?: any;
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */

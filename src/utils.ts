@@ -1,7 +1,7 @@
 import { webcrypto } from 'one-webcrypto';
 import * as uint8arrays from 'uint8arrays';
 import errors from './errors';
-import { CharSize, EccCurve, Msg } from './types';
+import { CharSize, EccCurve, ExportKeyFormat, Msg, PublicKey } from './types';
 import { DEFAULT_SALT_LENGTH } from './constants';
 
 /* Cryto */
@@ -20,8 +20,38 @@ export function eccCurveToBitLength(namedCurve: EccCurve): number {
 	return bitLength;	
 }
 
+/**
+ * Fingerprint an ec public key -- does not generalize to curves other than P-384
+ */
+export async function fingerprintEcPublicKey(
+	publicKey: PublicKey
+  ): Promise<Uint8Array> {
+	const publicKeyBytes = await webcrypto.subtle.exportKey(
+		ExportKeyFormat.RAW,
+		publicKey
+	).then((key) => new Uint8Array(key));
+
+	// TODO: Fix for other curves
+	// NOTE: This makes it so that we can't use any curve other than P-384
+	const size = 49;
+	const compressedPoint = new Uint8Array(size);
+	const x = publicKeyBytes.slice(1, size);
+	const y = publicKeyBytes.slice(size);
+  
+	// Note:
+	// first byte is 0x02 or 0x03 depending on the parity of the
+	// y-coordinate, followed by the x coordinate. We can't technically
+	// figure out whether the y-coodinate is odd without doing big number
+	// arithmetic, but this is a fair approximation.
+	compressedPoint[0] = y[y.length - 1] % 2 === 0 ? 0x02 : 0x03;
+	compressedPoint.set(x, 1);
+  
+	const hash = await webcrypto.subtle.digest('SHA-1', compressedPoint);
+	return new Uint8Array(hash);
+  }
+
 // Interpret a Uint8Array as a fingerprint
-export function fingerprintFromBuf(buf: Uint8Array): string {
+export function prettyFingerprint(buf: Uint8Array): string {
 	return Array.from(buf)
 		.map((b) => b.toString(16).padStart(2, '0'))
 		.join(':');
@@ -184,7 +214,8 @@ export async function structuralClone(obj: any) {
 
 export default {
 	joinCipherText,
-	fingerprintFromBuf,
+	fingerprintEcPublicKey,
+	prettyFingerprint,
 	eccCurveToBitLength,
 	splitCipherText,
 	arrBufToStr,

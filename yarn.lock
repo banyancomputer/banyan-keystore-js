@@ -1057,6 +1057,15 @@ balanced-match@^1.0.0:
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
 
+banyan-webcrypto-experiment@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/banyan-webcrypto-experiment/-/banyan-webcrypto-experiment-0.16.0.tgz#d00fa08c824dd6e6dbc7f1ada8eb9afac7c71b71"
+  integrity sha512-5jhFpmwtYqQqG4AwfZUOMFzPW9OAMfbRGSUJj5PWZ8Qn04+pojp7UG/vlOLLORIECshdQa7qmZgI2t1OLcf4Zg==
+  dependencies:
+    localforage "^1.10.0"
+    one-webcrypto "^1.0.3"
+    uint8arrays "^3.0.0"
+
 base@^0.11.1:
   version "0.11.2"
   resolved "https://registry.yarnpkg.com/base/-/base-0.11.2.tgz#7bde5ced145b6d551a90db87f83c558b4eb48a8f"

@@ -1,6 +1,6 @@
 {
-  "name": "banyan-webcrypto",
-  "version": "0.16.0",
+  "name": "banyan-webcrypto-experiment",
+  "version": "1.0.0",
   "description": "In-browser key management with IndexedDB and the Web Crypto API",
   "keywords": [],
   "type": "module",
@@ -76,6 +76,7 @@
     "typescript": "^4.4.2"
   },
   "dependencies": {
+    "banyan-webcrypto-experiment": "^0.16.0",
     "localforage": "^1.10.0",
     "one-webcrypto": "^1.0.3",
     "uint8arrays": "^3.0.0"
