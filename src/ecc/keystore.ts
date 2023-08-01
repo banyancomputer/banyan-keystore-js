@@ -87,13 +87,14 @@ export default class ECCKeyStore extends KeyStoreBase implements KeyStore {
     const escrowKey = await this.getSymmKey(mergedCfg.escrowKeyName);
     await IDB.createIfDoesNotExist(
       this.cfg.writeKeyPairName,
-      async () => ecc.importEscrowedKeyPair(
-        publicKey,
-        escrowedPrivateKey,
-        escrowKey,
-        mergedCfg.curve,
-        KeyUse.Write
-      ),
+      async () =>
+        ecc.importEscrowedKeyPair(
+          publicKey,
+          escrowedPrivateKey,
+          escrowKey,
+          mergedCfg.curve,
+          KeyUse.Write
+        ),
       this.store
     );
   }
@@ -107,13 +108,14 @@ export default class ECCKeyStore extends KeyStoreBase implements KeyStore {
     const escrowKey = await this.getSymmKey(mergedCfg.escrowKeyName);
     await IDB.createIfDoesNotExist(
       this.cfg.exchangeKeyPairName,
-      async () => ecc.importEscrowedKeyPair(
-        publicKey,
-        escrowedPrivateKey,
-        escrowKey,
-        mergedCfg.curve,
-        KeyUse.Exchange
-      ),
+      async () =>
+        ecc.importEscrowedKeyPair(
+          publicKey,
+          escrowedPrivateKey,
+          escrowKey,
+          mergedCfg.curve,
+          KeyUse.Exchange
+        ),
       this.store
     );
   }

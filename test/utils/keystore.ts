@@ -27,7 +27,9 @@ export const keystoreMethod = (opts: KeystoreMethodOpts): void => {
     beforeAll(async () => {
       jest.resetAllMocks();
       jest.spyOn(idb, 'getKeypair').mockImplementation((keyName) => {
-        return keyName === 'exchange-key-pair' ? mock.keys : mock.writeKeys;
+        return keyName === 'exchange-key-pair'
+          ? mock.exchnageKeys
+          : mock.writeKeys;
       });
 
       opts.mocks.forEach((mock) => {
