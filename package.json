@@ -1,6 +1,6 @@
 {
   "name": "banyan-webcrypto-experiment",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "In-browser key management with IndexedDB and the Web Crypto API",
   "keywords": [],
   "type": "module",

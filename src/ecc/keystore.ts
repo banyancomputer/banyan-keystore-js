@@ -78,62 +78,42 @@ export default class ECCKeyStore extends KeyStoreBase implements KeyStore {
     );
   }
 
-  async importPublicExchangeKey(
+  async importEscrowedWriteKeyPair(
     publicKey: string,
+    escrowedPrivateKey: string,
     cfg?: Partial<Config>
   ): Promise<void> {
     const mergedCfg = config.merge(this.cfg, cfg);
-    await IDB.createIfDoesNotExist(
-      this.cfg.exchangeKeyPairName,
-      () => ecc.importPublicKey(publicKey, mergedCfg.curve, KeyUse.Exchange),
-      this.store
-    );
-  }
-  async importPublicWriteKey(
-    publicKey: string,
-    cfg?: Partial<Config>
-  ): Promise<void> {
-    const mergedCfg = config.merge(this.cfg, cfg);
+    const escrowKey = await this.getSymmKey(mergedCfg.escrowKeyName);
     await IDB.createIfDoesNotExist(
       this.cfg.writeKeyPairName,
-      () => ecc.importPublicKey(publicKey, mergedCfg.curve, KeyUse.Write),
+      async () => ecc.importEscrowedKeyPair(
+        publicKey,
+        escrowedPrivateKey,
+        escrowKey,
+        mergedCfg.curve,
+        KeyUse.Write
+      ),
       this.store
     );
   }
 
-  async importEscrowedPrivateExchangeKey(
-    privateKey: string,
+  async importEscrowedExchangeKeyPair(
+    publicKey: string,
+    escrowedPrivateKey: string,
     cfg?: Partial<Config>
   ): Promise<void> {
     const mergedCfg = config.merge(this.cfg, cfg);
     const escrowKey = await this.getSymmKey(mergedCfg.escrowKeyName);
     await IDB.createIfDoesNotExist(
       this.cfg.exchangeKeyPairName,
-      () =>
-        ecc.importEscrowedPrivateKey(
-          privateKey,
-          escrowKey,
-          mergedCfg.curve,
-          KeyUse.Exchange
-        ),
-      this.store
-    );
-  }
-  async importEscrowedPrivateWriteKey(
-    privateKey: string,
-    cfg?: Partial<Config>
-  ): Promise<void> {
-    const mergedCfg = config.merge(this.cfg, cfg);
-    const escrowKey = await this.getSymmKey(mergedCfg.escrowKeyName);
-    await IDB.createIfDoesNotExist(
-      this.cfg.writeKeyPairName,
-      () =>
-        ecc.importEscrowedPrivateKey(
-          privateKey,
-          escrowKey,
-          mergedCfg.curve,
-          KeyUse.Write
-        ),
+      async () => ecc.importEscrowedKeyPair(
+        publicKey,
+        escrowedPrivateKey,
+        escrowKey,
+        mergedCfg.curve,
+        KeyUse.Exchange
+      ),
       this.store
     );
   }

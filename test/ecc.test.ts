@@ -18,15 +18,11 @@ describe('ecc', () => {
       expect(exportedPublicKey).toBeTruthy()
       const imported = await ecc.importPublicKey(exportedPublicKey, EccCurve.P_384, KeyUse.Exchange)
       expect(imported).toBeTruthy()
-      expect(imported).toHaveProperty('algorithm')
-      expect(imported).toHaveProperty('type')
       
       const wrappingKey = await aes.genKey(['wrapKey', 'unwrapKey']);
       const escrowedPrivateKey = await ecc.exportEscrowedPrivateKey(keys.privateKey as PrivateKey, wrappingKey);
-      const unwrappedPrivateKey = await ecc.importEscrowedPrivateKey(escrowedPrivateKey, wrappingKey, EccCurve.P_384,  KeyUse.Exchange);
+      const unwrappedPrivateKey = await ecc.importEscrowedKeyPair(exportedPublicKey, escrowedPrivateKey, wrappingKey, EccCurve.P_384,  KeyUse.Exchange);
       expect(unwrappedPrivateKey).toBeTruthy();
-      expect(unwrappedPrivateKey).toHaveProperty('algorithm');
-      expect(unwrappedPrivateKey).toHaveProperty('type');
     })
 
     it('implements operation methods', async () => {

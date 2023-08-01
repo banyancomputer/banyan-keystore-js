@@ -75,7 +75,9 @@ export async function importEscrowedPrivateKey(
 ): Promise<PrivateKey> {
   const alg = use === KeyUse.Exchange ? ECC_EXCHANGE_ALG : ECC_WRITE_ALG;
   const uses: KeyUsage[] = use === KeyUse.Exchange ? ['deriveBits'] : ['sign'];
-  const cipherText = utils.normalizeBase64ToBuf(wrappedPrivateKeyStr);
+  const cipherText = utils.normalizeBase64ToBuf(
+    wrappedPrivateKeyStr
+  );
   const [iv, cipherBytes] = utils.splitCipherText(cipherText);
   const privateKey = await webcrypto.subtle.unwrapKey(
     ExportKeyFormat.PKCS8,
@@ -92,7 +94,24 @@ export async function importEscrowedPrivateKey(
     true,
     uses
   );
-  return privateKey;
+  return privateKey as PrivateKey;
+}
+
+export async function importEscrowedKeyPair(
+  publicKeyStr: string,
+  wrappedPrivateKeyStr: string,
+  unwrappingKey: SymmKey,
+  curve: EccCurve,
+  use: KeyUse
+): Promise<CryptoKeyPair> {
+  const privateKey = await importEscrowedPrivateKey(
+    wrappedPrivateKeyStr,
+    unwrappingKey,
+    curve,
+    use
+  );
+  const publicKey = await importPublicKey(publicKeyStr, curve, use);
+  return { publicKey, privateKey };
 }
 
 /**
@@ -129,4 +148,5 @@ export default {
   exportPublicKey,
   exportEscrowedPrivateKey,
   importEscrowedPrivateKey,
+  importEscrowedKeyPair,
 };
