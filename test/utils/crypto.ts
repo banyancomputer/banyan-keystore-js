@@ -26,7 +26,7 @@ type WebCryptoReqOpts = {
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-export const cryptoMethod = (opts: WebCryptoReqOpts): void => {
+export const cryptoMethodMock = (opts: WebCryptoReqOpts): void => {
   return describe(opts.desc, () => {
     let fake: jest.Mock;
 

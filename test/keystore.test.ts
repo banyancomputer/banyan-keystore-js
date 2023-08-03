@@ -1,11 +1,9 @@
-import KeyStore from '../src/keystore'
+import * as KeyStore from '../src/keystore'
 import keys from '../src/ecc/keys'
-import operations from '../src/ecc/operations'
-import config, { defaultConfig } from '../src/config'
+import config from '../src/config'
 import idb from '../src/idb'
-import { DEFAULT_CHAR_SIZE, DEFAULT_ECC_CURVE, DEFAULT_HASH_ALG } from '../src/constants'
-import { EccCurve, KeyUse, CryptoSystem } from '../src/types'
-import { mock, keystoreMethod } from './utils'
+import { EccCurve, KeyUse } from '../src/types'
+import { mock } from './utils'
 
 jest.mock('../src/idb')
 jest.mock('../src/ecc/keys')
@@ -34,19 +32,13 @@ describe("KeyStore", () => {
         makeFn()
       })
 
-      response = await KeyStore.init({ exchangeKeyPairName: 'test-exchange', writeKeyPairName: 'test-write' })
+      response = await KeyStore.init({ 
+        exchangeKeyPairName: 'test-exchange', 
+        writeKeyPairName: 'test-write',
+        escrowKeyName: 'test-escrow'
+      })
       await response.genExchangeKeyPair()
       await response.genWriteKeyPair()
-      
-    })
-
-    it('should initialize a keystore with expected params', () => {
-      let cfg = config.normalize({
-        exchangeKeyPairName: 'test-exchange',
-        writeKeyPairName: 'test-write'
-      })
-      const keystore = new KeyStore(cfg, mock.idbStore)
-      expect(response).toStrictEqual(keystore)
     })
 
     it('should call createIfDoesNotExist with correct params (exchange key)', () => {
@@ -72,89 +64,5 @@ describe("KeyStore", () => {
         KeyUse.Write
       ])
     })
-
   })
-
-  // Note: These don't work because the mocks are not correct
-  // keystoreMethod({
-  //   desc: 'sign',
-  //   mocks: [
-  //     {
-  //       mod: operations,
-  //       meth: 'sign',
-  //       resp: mock.sigBytes,
-  //       params: [
-  //         mock.msgStr,
-  //         mock.writeKeys.privateKey as CryptoKey,
-  //         DEFAULT_CHAR_SIZE,
-  //         DEFAULT_HASH_ALG
-  //       ]
-  //     }
-  //   ],
-  //   reqFn: (ks) => ks.sign(mock.msgStr),
-  //   expectedResp: mock.sigStr,
-  // })
-
-
-  // keystoreMethod({
-  //   desc: 'verify',
-  //   mocks: [
-  //     {
-  //       mod: operations,
-  //       meth: 'verify',
-  //       resp: true,
-  //       params: [
-  //         mock.msgStr,
-  //         mock.sigStr,
-  //         mock.keyBase64,
-  //         DEFAULT_CHAR_SIZE,
-  //         DEFAULT_ECC_CURVE,
-  //         DEFAULT_HASH_ALG
-  //       ]
-  //     }
-  //   ],
-  //   reqFn: (ks) => ks.verify(mock.msgStr, mock.sigStr, mock.keyBase64),
-  //   expectedResp: true,
-  // })
-
-
-  // keystoreMethod({
-  //   desc: 'encrypt',
-  //   mocks: [
-  //     {
-  //       mod: operations,
-  //       meth: 'encrypt',
-  //       resp: mock.cipherBytes,
-  //       params: [
-  //         mock.msgStr,
-  //         mock.keys.privateKey,
-  //         mock.keyBase64,
-  //         DEFAULT_CHAR_SIZE,
-  //         DEFAULT_ECC_CURVE
-  //       ]
-  //     }
-  //   ],
-  //   reqFn: (ks) => ks.encrypt(mock.msgStr, mock.keyBase64),
-  //   expectedResp: mock.cipherStr,
-  // })
-
-
-  // keystoreMethod({
-  //   desc: 'decrypt',
-  //   mocks: [
-  //     {
-  //       mod: operations,
-  //       meth: 'decrypt',
-  //       resp: mock.msgBytes,
-  //       params: [
-  //         mock.cipherStr,
-  //         mock.keys.privateKey,
-  //         mock.keyBase64,
-  //         DEFAULT_ECC_CURVE
-  //       ]
-  //     }
-  //   ],
-  //   reqFn: (ks) => ks.decrypt(mock.cipherStr, mock.keyBase64),
-  //   expectedResp: mock.msgStr,
-  // })
 })

@@ -2,6 +2,7 @@ import utils from '../../src/utils';
 
 const iv = new Uint8Array([1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4])
   .buffer;
+const derivedBits = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]).buffer;
 const msgStr = 'test msg bytes';
 const msgBytes = utils.strToArrBuf(msgStr, 16);
 const sigStr = 'dGVzdCBzaWduYXR1cmU=';
@@ -29,14 +30,15 @@ export const mock = {
       usages: ['sign', 'verify'],
     } as CryptoKey,
   } as any,
-  encryptForKey: {
-    publicKey: { type: 'encrypt-pub' } as any,
-    privateKey: { type: 'encrypt-priv' } as any,
+  exchnageKeys: {
+    publicKey: { type: 'exchange-pub' } as any,
+    privateKey: { type: 'exchange-priv' } as any,
   } as any,
   symmKey: { type: 'symm', algorithm: 'AES-GCM' } as any,
   symmKeyName: 'symm-key',
   keyBase64: 'q83vEjRWeJA=',
   iv,
+  derivedBits,
   msgStr,
   msgBytes,
   sigStr,

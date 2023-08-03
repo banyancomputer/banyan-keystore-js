@@ -1,4 +1,4 @@
-import KeyStore from '../src/keystore'
+import * as KeyStore from '../src/keystore'
 import config from '../src/config'
 
 jest.mock('../src/idb')
@@ -14,8 +14,7 @@ describe('keystore', () => {
 
       it('should instantiate a keystore and cleat it without error', async () => {
         const resp = await KeyStore.init()
-        expect(resp).toBeInstanceOf(KeyStore)
-        await resp.clear()
+        await KeyStore.clear()
       })
     })
   })

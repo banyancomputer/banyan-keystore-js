@@ -1,5 +1,5 @@
 import { webcrypto } from 'one-webcrypto';
-import { HashAlg, SymmKeyOpts, ExportKeyFormat } from '../types';
+import { HashAlg, SymmKeyOpts, ExportKeyFormat, SymmKey } from '../types';
 import {
   DEFAULT_HASH_ALG,
   DEFAULT_SYMM_ALG,
@@ -14,7 +14,7 @@ import {
  * @param hashAlg Hash algorithm to use. Default is SHA-256.
  * @param uses Key usage. Default is encrypt/decrypt.
  * @param opts Optional symmetric key options.
- * @returns A promise that resolves to a CryptoKey and the salt used to derive it.
+ * @returns A promise that resolves to a CryptoKey
  */
 export async function deriveKey(
   ikm: ArrayBuffer,
@@ -23,17 +23,10 @@ export async function deriveKey(
   hashAlg: HashAlg = DEFAULT_HASH_ALG,
   uses: KeyUsage[] = ['encrypt', 'decrypt'],
   opts?: Partial<SymmKeyOpts>
-): Promise<CryptoKey> {
+): Promise<SymmKey> {
   const enc = new TextEncoder();
   return await webcrypto.subtle
-    .importKey(
-      ExportKeyFormat.RAW,
-      ikm,
-      'HKDF',
-      // TODO: does this need to be exportable?
-      true,
-      ['deriveBits']
-    )
+    .importKey(ExportKeyFormat.RAW, ikm, 'HKDF', false, ['deriveBits'])
     .then((baseKey) =>
       webcrypto.subtle.deriveBits(
         {
